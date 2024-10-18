@@ -33,7 +33,8 @@ export default class UserController {
         const { id } = req.params;
 
         if (!id) {
-            return res.status(400).json({ error: 'O id é obrigatório' });
+            res.status(400).json({ error: 'O id é obrigatório' });
+            return;
         }
 
         try {
@@ -44,10 +45,12 @@ export default class UserController {
             const user = await collection.findOne({ _id: new ObjectId(id) });
 
             if (!user) {
-                return res.status(404).json({ error: 'Usuário não encontrado' });
+                res.status(404).json({ error: 'Usuário não encontrado' });
+                return;
             }
 
-            return res.json(user);
+            res.json(user);
+            return;
         } catch (err) {
             res.status(500).json({ error: 'Erro ao buscar o usuário', details: err.message });
         } finally {
@@ -60,7 +63,8 @@ export default class UserController {
         const { name, form, email, passw } = req.body;
 
         if (!name || !form || !email || !passw) {
-            return res.status(400).json({ error: 'Nome, formação, email e senha são obrigatórios' });
+            res.status(400).json({ error: 'Nome, formação, email e senha são obrigatórios' });
+            return;
         }
 
         try {
@@ -83,7 +87,7 @@ export default class UserController {
 
         } finally {
             await client.close();
-            
+
         }
     }
 
