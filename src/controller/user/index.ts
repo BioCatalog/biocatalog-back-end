@@ -22,7 +22,7 @@ export default class UserController {
                 res.status(404).json({ error: 'Nenhum dado encontrado' });
             }
         } catch (err) {
-            res.status(500).json({ error: 'Erro ao buscar dados', details: err.message });
+            res.status(500).json({ error: 'Erro ao buscar dados', details: err });
         } finally {
             await client.close();
         }
@@ -52,7 +52,7 @@ export default class UserController {
             res.json(user);
             return;
         } catch (err) {
-            res.status(500).json({ error: 'Erro ao buscar o usuário', details: err.message });
+            res.status(500).json({ error: 'Erro ao buscar o usuário', details: err });
         } finally {
             await client.close();
         }
@@ -83,12 +83,11 @@ export default class UserController {
             }
 
         } catch (err) {
-            res.status(500).json({ error: 'Erro ao inserir o usuário', details: err.message });
+            res.status(500).json({ error: 'Erro ao inserir o usuário', details: err });
 
         } finally {
             await client.close();
 
         }
     }
-
 }
