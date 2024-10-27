@@ -1,9 +1,6 @@
 import { Request, Response } from 'express';
 import { MongoClient, ObjectId } from 'mongodb';
-
-const url = 'mongodb://localhost:27017';
-const dbName = 'modelagem';
-
+import { dbName, url } from '../../constants';
 export default class UserController {
 
     static async getAll(req: Request, res: Response) {
@@ -12,7 +9,7 @@ export default class UserController {
         try {
             await client.connect();
             const db = client.db(dbName);
-            const collection = db.collection('cliente');
+            const collection = db.collection('usuario');
 
             const resul = await collection.find().toArray();
 
@@ -40,7 +37,7 @@ export default class UserController {
         try {
             await client.connect();
             const db = client.db(dbName);
-            const collection = db.collection('cliente');
+            const collection = db.collection('usuario');
 
             const user = await collection.findOne({ _id: new ObjectId(id) });
 
@@ -55,39 +52,6 @@ export default class UserController {
             res.status(500).json({ error: 'Erro ao buscar o usuário', details: err });
         } finally {
             await client.close();
-        }
-    }
-
-    static async registerUser(req: Request, res: Response) {
-        const client = new MongoClient(url);
-        const { name, form, email, passw } = req.body;
-
-        if (!name || !form || !email || !passw) {
-            res.status(400).json({ error: 'Nome, formação, email e senha são obrigatórios' });
-            return;
-        }
-
-        try {
-            await client.connect();
-            const db = client.db(dbName);
-            const collection = db.collection('cliente');
-
-            const newUser = { name, form, email, passw };
-
-            const result = await collection.insertOne(newUser);
-
-            if (result.acknowledged) {
-                res.status(201).json({ message: 'Usuário inserido com sucesso', userId: result.insertedId });
-            } else {
-                res.status(500).json({ error: 'Erro ao inserir o usuário' });
-            }
-
-        } catch (err) {
-            res.status(500).json({ error: 'Erro ao inserir o usuário', details: err });
-
-        } finally {
-            await client.close();
-
         }
     }
 }
