@@ -18,7 +18,7 @@ export default class AuthController {
             const db = client.db(dbName);
             const collection = db.collection('usuario');
 
-            const newUser = { name, form, email, password };
+            const newUser = { name, form, email, password: bcrypt.hashSync(password, 10) };
 
             const result = await collection.insertOne(newUser);
 
