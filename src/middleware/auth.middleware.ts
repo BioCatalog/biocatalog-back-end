@@ -15,7 +15,7 @@ export default async function authMiddleware
         const db = client.db(dbName);
         const collection = db.collection('usuario');
 
-        const userToken = await collection.findOne({ "token": authorization });
+        const userToken = await collection.findOne({ "token.token": authorization });
         
         if (!userToken) return res.status(401).json({error: 'Token não encotrado'});
         
@@ -24,13 +24,8 @@ export default async function authMiddleware
             return res.status(401).json({error: 'Login expirado'});
         }
     
-        req.headers.userId = userToken.userId.toString()
-        next()
-        // if (resul.length > 0) {
-        //     res.status(200).json({ resul });
-        // } else {
-        //     res.status(404).json({ error: 'Nenhum dado encontrado' });
-        // }
+        req.headers.userId = userToken.userId.toString();
+        next();
     } catch (err) {
         res.status(500).json({ error: 'Erro ao realiar autenticação', details: err });
     } finally {
