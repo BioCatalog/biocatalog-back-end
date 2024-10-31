@@ -15,7 +15,7 @@ export default async function authMiddleware
         const db = client.db(dbName);
         const collection = db.collection('usuario');
 
-        const userToken = await collection.findOne({ "token.token": authorization });
+        const userToken = await collection.findOne({ token: { token: authorization } });
         
         if (!userToken) return res.status(401).json({error: 'Token não encotrado'});
         
