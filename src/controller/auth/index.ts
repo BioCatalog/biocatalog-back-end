@@ -131,8 +131,8 @@ export default class AuthController {
         const { oldPass, newPass } = req.body;
         const { userId } = req.headers;
         const client = new MongoClient(url);
-
-        if (!oldPass || !newPass || userId) {
+        
+        if (!oldPass || !newPass || !userId) {
             res.status(400).json({ error: 'Informe suas credenciais!' });
             return;
         }
@@ -142,7 +142,7 @@ export default class AuthController {
             const db = client.db(dbName);
             const collection = db.collection('usuario');
 
-            const user = await collection.findOne({ _id: new ObjectId(userId) });
+            const user = await collection.findOne({ _id: new ObjectId(userId.toString()) });
 
             if (!user) {
                 res.status(400).json({ error: "Usuário inexistente!" });
