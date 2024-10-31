@@ -163,7 +163,7 @@ export default class AuthController {
                     }
                 });
 
-            return res.status(200).json({ mensagem: "Senha atulizada com sucesso!" });
+            return res.status(200).json({ message: "Senha atulizada com sucesso!" });
         } catch (err) {
             res.status(500).json({ error: 'Erro ao atualizar a senha', details: err });
         }
