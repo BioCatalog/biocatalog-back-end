@@ -4,7 +4,7 @@ import authRoutes from "./auth/auth.routes";
 
 const routes = Router();
 
-routes.use(userRoutes);
-routes.use(authRoutes);
+routes.use('/user', userRoutes);
+routes.use('/auth', authRoutes);
 
 export default routes;

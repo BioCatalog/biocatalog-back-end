@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 import { dbName, url } from "../../constants";
 import bcrypt from 'bcrypt'
 
@@ -9,8 +9,7 @@ export default class AuthController {
         const { name, form, email, password } = req.body;
 
         if (!name || !form || !email || !password) {
-            res.status(400).json({ error: 'Nome, formação, email e senha são obrigatórios' });
-            return;
+            return res.status(400).json({ error: 'Nome, formação, email e senha são obrigatórios' });
         }
 
         try {
@@ -125,6 +124,48 @@ export default class AuthController {
 
         } finally {
             await client.close();
+        }
+    }
+
+    static async changePass(req: Request, res: Response) {
+        const { oldPass, newPass } = req.body;
+        const { userId } = req.headers;
+        const client = new MongoClient(url);
+        
+        if (!oldPass || !newPass || !userId) {
+            res.status(400).json({ error: 'Informe suas credenciais!' });
+            return;
+        }
+
+        try {
+            await client.connect();
+            const db = client.db(dbName);
+            const collection = db.collection('usuario');
+
+            const user = await collection.findOne({ _id: new ObjectId(userId.toString()) });
+
+            if (!user) {
+                res.status(400).json({ error: "Usuário inexistente!" });
+                return;
+            }
+
+            const passCheck = await bcrypt.compareSync(oldPass, user.password);
+
+            if (!passCheck) {
+                res.status(400).json({ error: "Senha atual incorreta!" });
+                return;
+            }
+
+            collection.updateOne({ _id: new ObjectId(user._id) },
+                {
+                    $set: {
+                        password: bcrypt.hashSync(newPass, 10)
+                    }
+                });
+
+            return res.status(200).json({ mensagem: "Senha atulizada com sucesso!" });
+        } catch (err) {
+            res.status(500).json({ error: 'Erro ao atualizar a senha', details: err });
         }
     }
 }
