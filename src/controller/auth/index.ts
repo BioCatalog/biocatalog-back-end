@@ -131,8 +131,8 @@ export default class AuthController {
         const client = new MongoClient(url);
         const { name, form, email } = req.body;
         const { userId } = req.headers;
-
-        if (!name || !form || !email || !userId) {
+        
+        if (!name && !form && !email || !userId) {
             return res.status(400).json({ error: 'Nome, formação e email são obrigatórios' });
         }
 
