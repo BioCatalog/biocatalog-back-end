@@ -127,6 +127,42 @@ export default class AuthController {
         }
     }
 
+    static async updateUser(req: Request, res: Response) {
+        const client = new MongoClient(url);
+        const { name, form, email } = req.body;
+        const { userId } = req.headers;
+        
+        if (!name && !form && !email || !userId) {
+            return res.status(400).json({ error: 'Nome, formação e email são obrigatórios' });
+        }
+
+        try {
+            await client.connect();
+            const db = client.db(dbName);
+            const collection = db.collection('usuario');
+
+            const user = await collection.findOne({ _id: new ObjectId(userId.toString()) });
+
+            if (!user) {
+                res.status(400).json({ error: "Usuário inexistente!" });
+                return;
+            }
+
+            collection.updateOne({ _id: new ObjectId(user._id) },
+                {
+                    $set: {
+                        name: name,
+                        form: form, 
+                        email: email
+                    }
+                });
+
+            return res.status(200).json({ message: "Usuário atulizado com sucesso!" });
+        } catch (err) {
+            res.status(500).json({ error: 'Erro ao atualizar usuário', details: err });
+        }
+    }
+
     static async changePass(req: Request, res: Response) {
         const { oldPass, newPass } = req.body;
         const { userId } = req.headers;
@@ -163,7 +199,7 @@ export default class AuthController {
                     }
                 });
 
-            return res.status(200).json({ mensagem: "Senha atulizada com sucesso!" });
+            return res.status(200).json({ message: "Senha atulizada com sucesso!" });
         } catch (err) {
             res.status(500).json({ error: 'Erro ao atualizar a senha', details: err });
         }
